@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+    <link href="css/styles.css" rel="stylesheet" type="text/css" />
+    <link href="css/jq.css" rel="stylesheet" type="text/css" />
+    <script src="scripts/util.js" type="text/javascript"></script>
+    <script src="scripts/timer.js" type="text/javascript"></script>
+    <script src="scripts/popup.js" type="text/javascript"></script>
+    <script src="jquery-1.7.1.js" type="text/javascript"></script>
+	<title>Dating Game</title>
+
+<script type="text/javascript">	
+
+function updateSelected(radioId)
+{
+	document.getElementById('choice').innerHTML = radioId;  
+}
+
+function load()
+{
+	var fullURL = parent.document.URL; 
+    var queryString = fullURL.substring(fullURL.indexOf('?')+1, fullURL.length);
+    var pairs = queryString.split("&"); 
+	//for(var i = 0; i < pairs.length; i++) {
+	var pos = pairs[0].indexOf('=');
+	//}
+	
+	document.getElementById("name").innerHTML = pairs[0].substring(pos+1);
+	
+	if(pairs[2] == "diff=easy")
+		document.getElementById('guessCount').innerHTML = 10;
+	else if(pairs[2] == "diff=medium")
+		document.getElementById('guessCount').innerHTML = 7;
+	else
+		document.getElementById('guessCount').innerHTML = 5;		
+	
+	var attributeTable = generateCandidates();	
+	
+	var newTable="<th></th><th>Name</th><th>Looks</th><th>Height</th><th>Coding</th><th>Music</th>"
+    + "<th>Humour</th><th>Witty</th><th>Math</th><th>Romantic</th><th>Rich</th>"
+    + "<th>Smart</th><th>Score</th>";  
+    
+	if(pairs[1] == "sex=female")
+	{
+
+		var candidates=new Array("Anjelina Jolie","Scarlett Johansson","Julia Roberts", "Jennifer Lopez","Shakira",
+								 "Rihanna", "Madonna", "Maria Sharapova", "Serena Williams", "Anna Kournikova",
+								 "Aishwarya Rai", "Heidi Klum","Jessica Alba","Halle Berry","Nicole Kidman",
+								 "Oprah Winfrey", "Kobie Smulders", "Sarah Jessica Parker","Jennifer Aniston","Lady Gaga");
+									
+																					
+		for(var i = 0; i < 20; i++)
+		{
+		    if(i%2==0)
+		   {
+    	     newTable += "<tr class='odd' id='crow" + (i+1) + "' ><td><input type='radio' name='radioGroup' id='radio" + (i+1) + "' " + "onclick = 'updateSelected(" + (i+1) + ")' /></td><td>" + candidates[i] + "</td>";
+		   }
+		   else
+		   {
+			 newTable += "<tr id='crow" + (i+1) + "' ><td><input type='radio' name='radioGroup' id='radio" + (i+1) + "' " + "onclick = 'updateSelected(" + (i+1) + ")' /></td><td>" + candidates[i] + "</td>";
+		   }
+		   
+		   for(var j = 0; j < 10; j++)
+		   {
+		     newTable += "<td>" + attributeTable[i][j] + "</td>";  
+		   }
+		   newTable += "<td class='score'>" + attributeTable[i][j] + "</td>" + "</tr>";
+		}
+	}
+	else 
+	{
+		var candidates=new Array("Bill Gates","Mark Zuckerberg","David Beckham", "Warren Buffet","Larry Page",
+								 "Barack Obama", "Brad Pitt", "Leonardo Di Caprio", "George Clooney", "James Gosling",
+								 "Bill Clinton", "Russel Peters","Shah Rukh Khan","Lionel Messi","Roger Federer",
+								 "Tiger Woods", "Michael Schumacher", "Tom Cruise","Nicolas Cage","Al Pacino");
+										
+		for(var i = 0; i < 20; i++)
+		{
+		   if(i%2==0)
+		   {
+    		 newTable += "<tr class='odd' id='crow" + (i+1) + "' ><td><input type='radio' name='radioGroup' id='radio" + (i+1) + "' " + "onclick = 'updateSelected(" + (i+1) + ")' /></td><td>" + candidates[i] + "</td>";
+		   }
+		   else
+		   {
+			 newTable += "<tr id='crow" + (i+1) + "' ><td><input type='radio' name='radioGroup' id='radio" + (i+1) + "' " + "onclick = 'updateSelected(" + (i+1) + ")' /></td><td>" + candidates[i] + "</td>";
+		   }
+	
+		   for(var j = 0; j < 10; j++)
+		   {
+		     newTable += "<td>" + attributeTable[i][j] + "</td>"; 
+		   }
+		   newTable += "<td class='score'>" + attributeTable[i][j] + "</td>" + "</tr>";
+		   
+		}	
+	}
+	
+	document.getElementById('candidateTable').innerHTML=newTable;
+}
+
+function restart()
+{
+	window.location = "index.html";
+}
+
+function match()
+{
+	radioId = document.getElementById('choice').innerHTML;
+	if(radioId != "") {
+		document.getElementById('guessCounter').innerHTML = parseInt(document.getElementById('guessCounter').innerHTML) + 1;
+		document.getElementById("radio" + radioId).disabled = "true";
+		if(radioId%2 == 1) {			
+		document.getElementById("crow" + radioId).setAttribute("class", "rowdone");
+		}
+		else {
+			document.getElementById("crow" + radioId).setAttribute("class", "rowdone");
+		}
+		document.getElementById('guessCount').innerHTML -= 1; 
+		document.getElementById('choice').innerHTML = "";
+		document.getElementById("crow" + radioId).cells[12].setAttribute("class", "showScore");
+		
+		if( document.getElementById("crow" + radioId).cells[12].innerHTML > document.getElementById('scorebox').innerHTML )	 {
+			document.getElementById('scorebox').innerHTML = document.getElementById("crow" + radioId).cells[12].innerHTML;
+		}
+		
+		if(document.getElementById('scorebox').innerHTML == 1) {
+			var message = 'You tried ' + document.getElementById('guessCounter').innerHTML + ' dates to discover your ideal partner.';
+			message_box.show_message('You won!', message);
+			return true;
+		}	
+		
+		if(document.getElementById('guessCount').innerHTML == 0)
+		{
+			message_box.show_message('You Lost!', 'You have run out of chances');
+			return false;
+		}
+
+		return true;
+	}
+	else {
+		alert("Please select a candidate");
+		return false;
+	}	
+}
+</script>	
+
+</head>
+
+<!-- <body onload="load();"> -->
+
+<body onload="load(); Up();">
+<div id="header">
+<font style="padding-right:10px; float:right; color:white; font-size:12pt;">[<a style="color:white;" href=doc.html>&nbsp;Documentation</a>]</font>
+<br/>
+<br/>
+<br/>
+<h2 align="center"> Find Your Ideal Date</h2>
+</div>
+<div>
+
+<div align="center"><img src="images/logo.jpeg" height="70" width="70"></div>
+<br/>
+<div >
+
+<center>
+<table class="hide">
+<tr>
+<td class="left" width=242px><font size='4.5' color='black' family="Arial">&nbsp;&nbsp;Timer</font></td>
+<td class="center" width=242px><font size='4.5' color='black' family="Arial">Dater: <i><span id="name"></span></i></font></td>
+<td class="right" width=242px><font size='4.5' color='black' family="Arial">Score&nbsp;&nbsp;</font></td>
+</tr>
+<tr>
+
+<td width=242px class="left">
+		<div class="buttons">
+		<button type="submit" class="positive" name="save" value="0:0">
+        <img src="images/clock1.png" alt="" />
+        <span id="timer1"></span>
+		</button>
+		</div>
+</td>
+
+
+<td class="center" 	width=242px>
+<input type="image" src="images/cooltext607552887.png" onmouseover="this.src='images/cooltext607552887MouseOver.png';" onmouseout="this.src='images/cooltext607552887.png';" 
+onclick="match();" width="72" height="41" />
+</td>
+
+<td class="right"  width=242px;>
+<button id="scorebox">0</button>
+</td>
+</tr>
+</table>
+</center>
+<h3 align="center">Guesses Left: <span id='guessCount'></span> </h3>
+</div>
+<table id="candidateTable" align="center" class="special">
+</table>
+<br/>
+</div>
+
+<br/>
+<CENTER><input type="image" src="images/cooltext607612513.png" onmouseover="this.src='images/cooltext607612513MouseOver.png';" onmouseout="this.src='images/cooltext607612513.png';"  
+onclick="restart();" width="72" height="41" />
+</body></CENTER>
+<span id="choice" visibility="hidden" value=""></span>
+<span id="guessCounter" visibility="hidden" value="">0</span>
+</html>
